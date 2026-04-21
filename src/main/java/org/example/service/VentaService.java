@@ -52,7 +52,6 @@ public class VentaService implements VentaServiceIMP {
         existente.setSucursal(venta.getSucursal());
         existente.setDetalle(venta.getDetalle());
 
-        // ✅ Recalcular total
         calcularTotal(existente);
 
         Venta actualizada = repoVen.save(existente);
