@@ -18,7 +18,7 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Long idProducto;
-    @Column(length = 50, nullable = false)
+    @Column(length = 50, unique = true, nullable = false)
     private String nombre;
     @Column(name="categoria_producto", nullable = false)
     private String categoria;

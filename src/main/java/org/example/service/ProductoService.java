@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.aspectj.weaver.ast.Not;
 import org.example.dto.ProductoDTO;
 import org.example.exception.NotFoundException;
 import org.example.mapper.Mapper;
@@ -19,6 +20,11 @@ public class ProductoService implements ProductoServiceIMP {
     @Override
     public List<ProductoDTO> findProductos() {
         return proRepo.findAll().stream().map(Mapper::toDTO).toList();
+    }
+
+    @Override
+    public ProductoDTO findNameProducto(String nombre){
+        return proRepo.findByNombre(nombre).orElseThrow(()-> new NotFoundException("No se ha encontrado el producto"))
     }
 
     @Override
