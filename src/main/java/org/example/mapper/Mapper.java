@@ -57,4 +57,23 @@ public class Mapper {
                 .totalVenta(total)
                 .build();
     }
+
+    public static Venta toEntity(VentaDTO dto){
+        if(dto == null) return null;
+
+        Venta venta = new Venta();
+        venta.setIdVenta(dto.getIdVenta());
+        venta.setFecha(dto.getFecha());
+        venta.setEstado(dto.getEstado());
+
+        if(dto.getIdSucursal() != null){
+            Sucursal sucursal = new Sucursal();
+            sucursal.setIdSucursal(dto.getIdSucursal());
+            venta.setSucursal(sucursal);
+        }
+
+        return venta;
+    }
+
+
 }

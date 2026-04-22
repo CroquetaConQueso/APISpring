@@ -14,7 +14,7 @@ public class ProductoController {
 
     private ProductoServiceIMP productoServiceIMP;
 
-    @GetMapping("/devolverProductos")
+    @GetMapping
     public ResponseEntity<List<ProductoDTO>> traerProductos(){
 
         return ResponseEntity.ok(productoServiceIMP.findProductos());
@@ -25,20 +25,20 @@ public class ProductoController {
         return ResponseEntity.ok(productoServiceIMP.findProducto(id));
     }
 
-    @PostMapping("/crearProducto")
+    @PostMapping
     public ResponseEntity<ProductoDTO> crearProducto(@RequestBody ProductoDTO productoDTO){
         ProductoDTO creado = productoServiceIMP.crearProducto(productoDTO);
 
         return ResponseEntity.created(URI.create("/api/productos"+creado.getIdProducto())).body(creado);
     }
 
-    @PutMapping("/ponerProducto/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ProductoDTO> ponerProducto(@RequestBody ProductoDTO productoDTO,
                                                      @PathVariable Long id){
         return ResponseEntity.ok(productoServiceIMP.actualizarProducto(id,productoDTO));
     }
 
-    @DeleteMapping("/eliminarProducto/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ProductoDTO> eliminarProducto(@PathVariable Long id){
         productoServiceIMP.borrarProducto(id);
 

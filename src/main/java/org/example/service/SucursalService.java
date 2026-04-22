@@ -1,19 +1,20 @@
 package org.example.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.dto.SucursalDTO;
 import org.example.exception.NotFoundException;
 import org.example.mapper.Mapper;
 import org.example.modelos.Sucursal;
 import org.example.repository.SucursalRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class SucursalService implements SucursalServiceIMP {
 
-    @Autowired
+
     private SucursalRepository repoSuc;
 
     @Override
@@ -32,6 +33,8 @@ public class SucursalService implements SucursalServiceIMP {
                 .nombreSucursal(sucursalDto.getNombre())
                 .direccion(sucursalDto.getDireccion())
                 .build();
+
+        repoSuc.save(sucursal);
 
         return Mapper.toDTO(sucursal);
     }

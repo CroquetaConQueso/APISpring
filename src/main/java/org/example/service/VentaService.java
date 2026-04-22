@@ -1,23 +1,32 @@
 package org.example.service;
 
+import lombok.RequiredArgsConstructor;
+import org.example.dto.DetalleDTO;
 import org.example.dto.VentaDTO;
 import org.example.mapper.Mapper;
+import org.example.modelos.DetalleVenta;
+import org.example.modelos.Producto;
+import org.example.modelos.Sucursal;
 import org.example.modelos.Venta;
+import org.example.repository.ProductoRepository;
+import org.example.repository.SucursalRepository;
 import org.example.repository.VentaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class VentaService implements VentaServiceIMP {
-    @Autowired
-    private VentaRepository repoVen;
+
+    private final VentaRepository ventaRepo;
+    private final ProductoRepository productoRepo;
+    private final SucursalRepository sucursalRepo;
 
     @Override
     public List<VentaDTO> findVentas() {
-        return repoVen.findAll()
+        return ventaRepo.findAll()
                 .stream()
                 .map(Mapper::toDTO)
                 .toList();
@@ -25,36 +34,54 @@ public class VentaService implements VentaServiceIMP {
 
     @Override
     public VentaDTO findVenta(Long id) {
-        Venta venta = repoVen.findById(id)
+        Venta venta = ventaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada"));
 
         return Mapper.toDTO(venta);
     }
 
     @Override
-    public VentaDTO crearVenta(Venta venta) {
+    public VentaDTO crearVenta(VentaDTO ventaDto) {
+
+        Venta venta = new Venta();
+        venta.setFecha(ventaDto.getFecha());
+        venta.setEstado(ventaDto.getEstado());
+
+        Sucursal sucursal = sucursalRepo.findById(ventaDto.getIdSucursal())
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+
+        venta.setSucursal(sucursal);
+
+        List<DetalleVenta> detalles = construirDetalles(ventaDto.getDetalle(), venta);
+        venta.setDetalle(detalles);
 
         calcularTotal(venta);
 
-        Venta guardada = repoVen.save(venta);
+        Venta guardada = ventaRepo.save(venta);
 
         return Mapper.toDTO(guardada);
     }
 
     @Override
-    public VentaDTO actualizarVenta(Long id, Venta venta) {
+    public VentaDTO actualizarVenta(Long id, VentaDTO ventaDto) {
 
-        Venta existente = repoVen.findById(id)
+        Venta existente = ventaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada"));
 
-        existente.setFecha(venta.getFecha());
-        existente.setEstado(venta.getEstado());
-        existente.setSucursal(venta.getSucursal());
-        existente.setDetalle(venta.getDetalle());
+        existente.setFecha(ventaDto.getFecha());
+        existente.setEstado(ventaDto.getEstado());
+
+        Sucursal sucursal = sucursalRepo.findById(ventaDto.getIdSucursal())
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+
+        existente.setSucursal(sucursal);
+
+        List<DetalleVenta> detalles = construirDetalles(ventaDto.getDetalle(), existente);
+        existente.setDetalle(detalles);
 
         calcularTotal(existente);
 
-        Venta actualizada = repoVen.save(existente);
+        Venta actualizada = ventaRepo.save(existente);
 
         return Mapper.toDTO(actualizada);
     }
@@ -62,11 +89,29 @@ public class VentaService implements VentaServiceIMP {
     @Override
     public void borrarVenta(Long id) {
 
-        if (!repoVen.existsById(id)) {
+        if (!ventaRepo.existsById(id)) {
             throw new RuntimeException("Venta no encontrada");
         }
 
-        repoVen.deleteById(id);
+        ventaRepo.deleteById(id);
+    }
+
+    private List<DetalleVenta> construirDetalles(List<DetalleDTO> detalleDTOs, Venta venta) {
+
+        return detalleDTOs.stream().map(d -> {
+
+            Producto producto = productoRepo.findById(d.getIdProducto())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+            DetalleVenta detalle = new DetalleVenta();
+            detalle.setProducto(producto);
+            detalle.setCantidad(d.getCantidad());
+            detalle.setNotas(d.getNotas());
+            detalle.setVenta(venta);
+
+            return detalle;
+
+        }).toList();
     }
 
     private void calcularTotal(Venta venta) {

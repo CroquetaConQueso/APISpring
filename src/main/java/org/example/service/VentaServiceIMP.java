@@ -8,7 +8,7 @@ import java.util.List;
 public interface VentaServiceIMP {
     List<VentaDTO> findVentas();
     VentaDTO findVenta(Long id);
-    VentaDTO crearVenta(Venta venta);
-    VentaDTO actualizarVenta(Long id, Venta venta);
+    VentaDTO crearVenta(VentaDTO ventaDto);
+    VentaDTO actualizarVenta(Long id, VentaDTO ventaDto);
     void  borrarVenta(Long id);
 }

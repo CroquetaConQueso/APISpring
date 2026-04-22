@@ -1,20 +1,20 @@
 package org.example.service;
 
-import org.aspectj.weaver.ast.Not;
+import lombok.RequiredArgsConstructor;
 import org.example.dto.ProductoDTO;
 import org.example.exception.NotFoundException;
 import org.example.mapper.Mapper;
 import org.example.modelos.Producto;
 import org.example.repository.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class ProductoService implements ProductoServiceIMP {
 
-    @Autowired
+
     private ProductoRepository proRepo;
 
     @Override
@@ -24,7 +24,7 @@ public class ProductoService implements ProductoServiceIMP {
 
     @Override
     public ProductoDTO findNameProducto(String nombre){
-        return proRepo.findByNombre(nombre).orElseThrow(()-> new NotFoundException("No se ha encontrado el producto"))
+        return Mapper.toDTO(proRepo.findByNombre(nombre).orElseThrow(()-> new NotFoundException("No se ha encontrado el producto")));
     }
 
     @Override
